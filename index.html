@@ -1,0 +1,2044 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0B0F1A">
+<title>Toi & Moi 🇬🇦 — Prototype Neyla 241</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg: #0B0F1A;
+  --bg-2: #111827;
+  --card: #151B2B;
+  --card-2: #1B2338;
+  --accent: #E50914;
+  --accent-2: #FF2D3F;
+  --gold: #FBBF24;
+  --gold-2: #F59E0B;
+  --green: #009E60;
+  --blue: #3A75C4;
+  --text: #EEF2FF;
+  --muted: #8B96B8;
+  --border: #232B42;
+  --purple: #8B5CF6;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.app {
+  height: 100vh;
+  height: 100dvh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ==================== IMAGE DE FOND ==================== */
+.bg-image {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  z-index: 0;
+}
+.bg-image.active { opacity: 0.25; }
+
+.bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(26,34,56,0.7), rgba(11,15,26,0.95));
+  z-index: 1;
+}
+
+/* ==================== ÉCRANS ==================== */
+.screen {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 24px;
+  padding-top: env(safe-area-inset-top, 24px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(30px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.screen.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+.screen.exit {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+/* ==================== DRAPEAU GABON ==================== */
+.flag {
+  width: 42px;
+  height: 28px;
+  border-radius: 4px;
+  background: linear-gradient(to bottom,
+    #009E60 0%, #009E60 33.33%,
+    #FCD116 33.33%, #FCD116 66.66%,
+    #3A75C4 66.66%, #3A75C4 100%);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.flag::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.flag.sm { width: 28px; height: 19px; border-radius: 3px; }
+.flag.xs { width: 20px; height: 14px; border-radius: 2px; }
+.flag.lg { width: 56px; height: 38px; border-radius: 5px; }
+
+/* ==================== LOGO TV/D ==================== */
+.logo-tv {
+  width: 90px;
+  height: 72px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  box-shadow: 0 12px 30px rgba(229,9,20,0.5);
+  margin: 0 auto;
+}
+.logo-tv::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 20%;
+  right: 20%;
+  height: 10px;
+  background: linear-gradient(to right, var(--accent) 25%, transparent 25%, transparent 75%, var(--accent) 75%);
+}
+.logo-tv-inner {
+  width: 66px;
+  height: 50px;
+  background: var(--bg);
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 30px;
+  font-weight: 900;
+  color: #fff;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);
+}
+
+/* ==================== HEADER ==================== */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+  margin-bottom: 22px;
+  position: relative;
+}
+.back-btn {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.back-btn:active { transform: scale(0.94); background: var(--card-2); }
+.back-btn.hidden { visibility: hidden; }
+
+.header-title {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.header-sub {
+  font-size: 10px;
+  color: var(--gold);
+  letter-spacing: 1.8px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.profile-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 30px;
+  padding: 5px 14px 5px 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.profile-chip:active { transform: scale(0.95); }
+.avatar-sm {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 15px;
+  color: #fff;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid var(--gold);
+}
+.avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
+.profile-chip .name {
+  font-size: 12px;
+  font-weight: 700;
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==================== MARQUEE ==================== */
+.marquee-banner {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(90deg, rgba(0,158,96,0.5), rgba(0,158,96,0.2), rgba(0,158,96,0.5));
+  border-radius: 12px;
+  padding: 10px 0;
+  margin: 20px 0;
+  overflow: hidden;
+  border: 1px solid rgba(0,158,96,0.4);
+}
+.marquee {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.marquee span {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee 22s linear infinite;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+/* ==================== HOME ==================== */
+.home-logo {
+  margin-top: 20px;
+  margin-bottom: 22px;
+}
+.home-title {
+  font-size: 34px;
+  font-weight: 900;
+  text-align: center;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #fff 0%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.1;
+}
+.home-sub {
+  color: var(--gold);
+  font-size: 11px;
+  letter-spacing: 3px;
+  font-weight: 800;
+  text-align: center;
+  margin-top: 8px;
+  text-transform: uppercase;
+}
+.flag-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.home-intro {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-top: 24px;
+  padding: 0 20px;
+}
+
+/* ==================== SECTION ==================== */
+.section-title {
+  font-size: 13px;
+  color: var(--gold);
+  letter-spacing: 2.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 26px 0 14px 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title::before {
+  content: '';
+  width: 4px;
+  height: 18px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* ==================== GRILLE DE JEUX ==================== */
+.games-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.game-card {
+  background: linear-gradient(135deg, var(--card) 0%, var(--card-2) 100%);
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  padding: 20px 14px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.game-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--gold));
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.game-card:active {
+  transform: scale(0.96);
+  border-color: var(--gold);
+  box-shadow: 0 8px 24px rgba(251,191,36,0.2);
+}
+.game-card:active::before { opacity: 1; }
+.game-card.featured {
+  grid-column: span 2;
+  background: linear-gradient(135deg, rgba(229,9,20,0.15) 0%, rgba(139,92,246,0.15) 100%);
+  border-color: var(--accent);
+}
+.game-card.featured::before { opacity: 1; }
+.game-card .emoji {
+  font-size: 38px;
+  display: block;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+}
+.game-card.featured .emoji { font-size: 52px; }
+.game-card .name {
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+}
+.game-card.featured .name { font-size: 18px; }
+.game-card .desc {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 5px;
+  line-height: 1.3;
+}
+.game-card .badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--gold);
+  color: #000;
+  font-size: 9px;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+}
+
+/* ==================== BOUTONS PRINCIPAUX ==================== */
+.btn-primary {
+  width: 100%;
+  padding: 18px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 8px 22px rgba(229,9,20,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  letter-spacing: 0.3px;
+}
+.btn-primary:active { transform: scale(0.97); box-shadow: 0 4px 12px rgba(229,9,20,0.5); }
+
+.btn-gold {
+  width: 100%;
+  padding: 18px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-2));
+  color: #000;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 8px 22px rgba(251,191,36,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.btn-gold:active { transform: scale(0.97); }
+
+.btn-secondary {
+  width: 100%;
+  padding: 16px;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  background: transparent;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.btn-secondary:active { transform: scale(0.97); background: var(--card); }
+
+.btn-purple {
+  width: 100%;
+  padding: 16px;
+  border: 2px solid var(--purple);
+  border-radius: 16px;
+  background: transparent;
+  color: #A78BFA;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.btn-purple:active { transform: scale(0.97); background: rgba(139,92,246,0.15); }
+
+/* ==================== FIELDS ==================== */
+.field-label {
+  font-size: 11px;
+  color: var(--gold);
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  margin-bottom: 8px;
+  margin-top: 18px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.field-input {
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  color: #fff;
+  font-size: 15px;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.field-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(251,191,36,0.15);
+}
+.field-input::placeholder { color: var(--muted); }
+
+/* ==================== PROFIL ==================== */
+.avatar-big {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display: grid;
+  place-items: center;
+  font-size: 54px;
+  font-weight: 900;
+  color: #fff;
+  margin: 0 auto 22px;
+  cursor: pointer;
+  overflow: hidden;
+  border: 4px solid var(--gold);
+  box-shadow: 0 12px 40px rgba(251,191,36,0.35);
+  position: relative;
+  transition: all 0.25s;
+}
+.avatar-big:active { transform: scale(0.95); }
+.avatar-big img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-big::after {
+  content: '📷';
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: var(--gold);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  border: 3px solid var(--bg);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.anon-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-top: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.anon-row:active { transform: scale(0.98); border-color: var(--purple); }
+.anon-row .title { font-size: 14px; font-weight: 700; }
+.anon-row .sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+.toggle {
+  width: 54px;
+  height: 30px;
+  border-radius: 15px;
+  background: var(--border);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s;
+  flex-shrink: 0;
+}
+.toggle.on { background: var(--green); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.3s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+.toggle.on::after { transform: translateX(24px); }
+
+/* ==================== ACTION OU VÉRITÉ ==================== */
+.player-count-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin: 20px 0;
+}
+.count-btn {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 2px solid var(--border);
+  color: #fff;
+  font-size: 26px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: grid;
+  place-items: center;
+}
+.count-btn:active { transform: scale(0.9); background: var(--card-2); }
+.count-btn:disabled { opacity: 0.3; }
+.count-value {
+  font-size: 46px;
+  font-weight: 900;
+  color: var(--gold);
+  min-width: 80px;
+  text-align: center;
+  line-height: 1;
+}
+.count-label {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+.players-input-list {
+  margin-top: 20px;
+}
+.player-input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.player-num {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  color: #fff;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.player-input-row input {
+  flex: 1;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  color: #fff;
+  font-size: 15px;
+  outline: none;
+  font-family: inherit;
+}
+.player-input-row input:focus { border-color: var(--gold); }
+
+/* ==================== CATEGORY SELECTOR ==================== */
+.category-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+.category-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 18px;
+  padding: 22px 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.category-card:active { transform: scale(0.96); }
+.category-card.selected {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(251,191,36,0.05));
+  box-shadow: 0 8px 24px rgba(251,191,36,0.2);
+}
+.category-card .emoji { font-size: 38px; display: block; margin-bottom: 8px; }
+.category-card .label { font-size: 15px; font-weight: 800; color: #fff; }
+.category-card .sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+/* ==================== LEVEL SELECTOR ==================== */
+.level-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+.level-card {
+  flex: 1;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.level-card:active { transform: scale(0.96); }
+.level-card.selected {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(251,191,36,0.05));
+}
+.level-card .emoji { font-size: 28px; display: block; margin-bottom: 6px; }
+.level-card .label { font-size: 13px; font-weight: 800; color: #fff; }
+
+/* ==================== JEU ACTION OU VÉRITÉ ==================== */
+.game-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  gap: 12px;
+}
+.player-badge {
+  flex: 1;
+  background: linear-gradient(135deg, var(--card), var(--card-2));
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s;
+}
+.player-badge.active {
+  border-color: var(--gold);
+  box-shadow: 0 8px 24px rgba(251,191,36,0.25);
+}
+.player-badge .avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 18px;
+  color: #fff;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.player-badge .avatar img { width: 100%; height: 100%; object-fit: cover; }
+.player-badge .info { flex: 1; overflow: hidden; }
+.player-badge .info .label { font-size: 10px; color: var(--gold); font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; }
+.player-badge .info .name { font-size: 15px; font-weight: 800; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.score-chip {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.score-chip .num { font-size: 22px; font-weight: 900; color: var(--gold); line-height: 1; }
+.score-chip .lbl { font-size: 9px; color: var(--muted); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+
+/* CHOICE ACTION / VÉRITÉ */
+.choice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 8px;
+}
+.choice-big {
+  padding: 34px 16px;
+  border: none;
+  border-radius: 22px;
+  cursor: pointer;
+  transition: all 0.25s;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+}
+.choice-big:active { transform: scale(0.95); }
+.choice-big.action {
+  background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+  box-shadow: 0 12px 32px rgba(139,92,246,0.4);
+}
+.choice-big.verite {
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  box-shadow: 0 12px 32px rgba(245,158,11,0.4);
+}
+.choice-big .emoji { font-size: 48px; display: block; margin-bottom: 10px; }
+.choice-big .label { font-size: 20px; font-weight: 900; letter-spacing: 1px; }
+.choice-big .sub { font-size: 11px; opacity: 0.85; margin-top: 4px; font-weight: 600; }
+
+/* CARTE */
+.card-display {
+  background: linear-gradient(135deg, var(--card), var(--card-2));
+  border: 2px solid var(--border);
+  border-radius: 24px;
+  padding: 40px 26px;
+  text-align: center;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 16px 0;
+  position: relative;
+  animation: cardIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.card-display.action {
+  border-color: var(--purple);
+  background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(139,92,246,0.05));
+}
+.card-display.verite {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(251,191,36,0.05));
+}
+@keyframes cardIn {
+  0% { opacity: 0; transform: scale(0.85) rotateY(20deg); }
+  100% { opacity: 1; transform: scale(1) rotateY(0); }
+}
+.card-type {
+  font-size: 11px;
+  letter-spacing: 3px;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  padding: 6px 16px;
+  border-radius: 20px;
+}
+.card-display.action .card-type { background: rgba(139,92,246,0.25); color: #C4B5FD; }
+.card-display.verite .card-type { background: rgba(251,191,36,0.25); color: var(--gold); }
+.card-text {
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #fff;
+}
+
+/* BOUTONS JEU */
+.game-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+.game-actions .btn-primary, .game-actions .btn-secondary { margin-top: 0; }
+.game-actions.full { grid-template-columns: 1fr; }
+
+/* ORDRE DES JOUEURS */
+.order-list {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 0;
+  margin-top: 10px;
+}
+.order-chip {
+  padding: 8px 14px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.order-chip.current {
+  background: linear-gradient(135deg, var(--gold), var(--gold-2));
+  color: #000;
+  border-color: var(--gold);
+}
+
+/* FIN DE JEU */
+.winner-card {
+  background: linear-gradient(135deg, var(--gold), var(--gold-2));
+  border-radius: 24px;
+  padding: 40px 24px;
+  text-align: center;
+  color: #000;
+  box-shadow: 0 20px 60px rgba(251,191,36,0.45);
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.winner-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.4), transparent 70%);
+  pointer-events: none;
+}
+.winner-card .emoji { font-size: 68px; display: block; margin-bottom: 12px; }
+.winner-card .name { font-size: 30px; font-weight: 900; letter-spacing: 0.5px; }
+.winner-card .score { font-size: 17px; font-weight: 700; margin-top: 8px; }
+
+.score-list {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  padding: 8px;
+  margin-bottom: 20px;
+}
+.score-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin-bottom: 4px;
+}
+.score-row:last-child { margin-bottom: 0; }
+.score-row:nth-child(1) { background: linear-gradient(90deg, rgba(251,191,36,0.15), transparent); }
+.score-row .rank { font-size: 18px; font-weight: 900; color: var(--gold); width: 36px; }
+.score-row .name { flex: 1; font-size: 15px; font-weight: 700; }
+.score-row .pts { font-size: 17px; font-weight: 900; color: var(--gold); }
+
+/* CREDIT */
+.credit {
+  margin-top: auto;
+  padding-top: 30px;
+  padding-bottom: 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.8;
+}
+.credit b { color: var(--gold); font-weight: 800; }
+.credit .author {
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.5px;
+  margin: 4px 0;
+}
+.credit-flag-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--card);
+  border: 2px solid var(--gold);
+  color: #fff;
+  padding: 14px 22px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.6);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 999;
+  max-width: 90vw;
+  text-align: center;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* SCROLL */
+.screen::-webkit-scrollbar { width: 6px; }
+.screen::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* SPACER */
+.spacer { height: 20px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- FONDS DÉFILANTS -->
+  <div class="bg-image" id="bg1"></div>
+  <div class="bg-image" id="bg2"></div>
+  <div class="bg-overlay"></div>
+
+  <!-- ============ ACCUEIL ============ -->
+  <div class="screen active" id="screenHome">
+    <div class="app-header">
+      <div style="flex:1"></div>
+      <div class="profile-chip" onclick="navigateTo('screenProfile')">
+        <div class="avatar-sm" id="homeAvatar">?</div>
+        <div class="name" id="homeName">Profil</div>
+      </div>
+    </div>
+
+    <div class="home-logo"><div class="logo-tv"><div class="logo-tv-inner">D</div></div></div>
+    <div class="home-title">Toi & Moi</div>
+    <div class="home-sub">Prototype Neyla 241</div>
+    <div class="flag-row">
+      <div class="flag"></div>
+      <div class="flag lg"></div>
+      <div class="flag"></div>
+    </div>
+
+    <div class="home-intro">
+      Le jeu qui rapproche.<br>
+      Découvre, joue et ris avec ceux que tu aimes.
+    </div>
+
+    <div class="marquee-banner">
+      <div class="flag sm"></div>
+      <div class="marquee"><span>🇬🇦 Cette application est construite 100% gabonaise  •  Conçu par Damien Starly Koumba  •  Prototype Neyla 241  •  </span></div>
+      <div class="flag sm"></div>
+    </div>
+
+    <div class="section-title">🎮 Jeux à plusieurs</div>
+    <div class="games-grid">
+      <div class="game-card featured" onclick="startActionVerite()">
+        <span class="badge">NOUVEAU</span>
+        <span class="emoji">🎭</span>
+        <div class="name">Action ou Vérité</div>
+        <div class="desc">Jusqu'à 15 joueurs</div>
+      </div>
+      <div class="game-card" onclick="openGameInfo('Qui de nous deux ?')">
+        <span class="emoji">💕</span>
+        <div class="name">Qui de nous deux</div>
+        <div class="desc">Pour les couples</div>
+      </div>
+      <div class="game-card" onclick="openGameInfo('Devine qui je suis')">
+        <span class="emoji">🧠</span>
+        <div class="name">Devine qui je suis</div>
+        <div class="desc">2-10 joueurs</div>
+      </div>
+      <div class="game-card" onclick="openGameInfo('Ciné Quiz')">
+        <span class="emoji">🎬</span>
+        <div class="name">Ciné Quiz</div>
+        <div class="desc">Films & séries</div>
+      </div>
+      <div class="game-card" onclick="openGameInfo('Blind Test')">
+        <span class="emoji">🎵</span>
+        <div class="name">Blind Test</div>
+        <div class="desc">Devine la musique</div>
+      </div>
+      <div class="game-card" onclick="openGameInfo('Pictionary')">
+        <span class="emoji">🎨</span>
+        <div class="name">Pictionary</div>
+        <div class="desc">Dessine et devine</div>
+      </div>
+      <div class="game-card" onclick="openGameInfo('Mime & Devine')">
+        <span class="emoji">🗣️</span>
+        <div class="name">Mime & Devine</div>
+        <div class="desc">Sans parler !</div>
+      </div>
+      <div class="game-card" onclick="openGameInfo('Je n\'ai jamais')">
+        <span class="emoji">🎯</span>
+        <div class="name">Je n'ai jamais</div>
+        <div class="desc">Confessions</div>
+      </div>
+      <div class="game-card" onclick="openGameInfo('Ludo')">
+        <span class="emoji">🎲</span>
+        <div class="name">Ludo</div>
+        <div class="desc">Jeu classique</div>
+      </div>
+      <div class="game-card" onclick="openGameInfo('Morpion')">
+        <span class="emoji">⭕</span>
+        <div class="name">Morpion</div>
+        <div class="desc">Tic Tac Toe</div>
+      </div>
+      <div class="game-card" onclick="openGameInfo('Qui est le plus...')">
+        <span class="emoji">🏆</span>
+        <div class="name">Qui est le plus</div>
+        <div class="desc">Vote secret</div>
+      </div>
+      <div class="game-card" onclick="openGameInfo('Deux Vérités')">
+        <span class="emoji">🤔</span>
+        <div class="name">2 Vérités 1 Mensonge</div>
+        <div class="desc">Devine le faux</div>
+      </div>
+      <div class="game-card" onclick="openGameInfo('Histoire à compléter')">
+        <span class="emoji">📖</span>
+        <div class="name">Histoire à compléter</div>
+        <div class="desc">Créez ensemble</div>
+      </div>
+      <div class="game-card" onclick="openGameInfo('Charades')">
+        <span class="emoji">🎭</span>
+        <div class="name">Charades</div>
+        <div class="desc">Mime par équipe</div>
+      </div>
+      <div class="game-card" onclick="openGameInfo('Devine le nombre')">
+        <span class="emoji">🎯</span>
+        <div class="name">Devine le nombre</div>
+        <div class="desc">1 à 100</div>
+      </div>
+    </div>
+
+    <div class="section-title">🎯 Jeux solo</div>
+    <div class="games-grid">
+      <div class="game-card" onclick="openGameInfo('Quiz Culture')">
+        <span class="emoji">🧩</span>
+        <div class="name">Quiz Culture</div>
+        <div class="desc">1000 questions</div>
+      </div>
+      <div class="game-card" onclick="openGameInfo('Sudoku')">
+        <span class="emoji">🔢</span>
+        <div class="name">Sudoku</div>
+        <div class="desc">Puzzle</div>
+      </div>
+      <div class="game-card" onclick="openGameInfo('Solitaire')">
+        <span class="emoji">🃏</span>
+        <div class="name">Solitaire</div>
+        <div class="desc">Cartes</div>
+      </div>
+      <div class="game-card" onclick="openGameInfo('Memory')">
+        <span class="emoji">🎴</span>
+        <div class="name">Memory</div>
+        <div class="desc">Retrouve les paires</div>
+      </div>
+      <div class="game-card" onclick="openGameInfo('Devine la chanson')">
+        <span class="emoji">🎵</span>
+        <div class="name">Devine la chanson</div>
+        <div class="desc">Culture musicale</div>
+      </div>
+    </div>
+
+    <div class="credit">
+      <div class="credit-flag-row">
+        <div class="flag xs"></div>
+        <div class="flag sm"></div>
+        <div class="flag xs"></div>
+      </div>
+      <div class="author">Conçu par Damien Starly Koumba</div>
+      PROTOTYPE NEYLA 241 • 100% GABONAISE
+    </div>
+  </div>
+
+  <!-- ============ PROFIL ============ -->
+  <div class="screen" id="screenProfile">
+    <div class="app-header">
+      <button class="back-btn" onclick="goBack()">← Retour</button>
+      <div class="header-title">Mon profil</div>
+      <div style="width:80px"></div>
+    </div>
+
+    <div class="avatar-big" id="avatarBig" onclick="pickPhoto()">?</div>
+    <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhoto(event)">
+
+    <div class="field-label">👤 Nom affiché</div>
+    <input class="field-input" id="inputName" type="text" placeholder="Ton nom ou pseudo" maxlength="20">
+
+    <div class="field-label">📱 Numéro de téléphone</div>
+    <input class="field-input" id="inputPhone" type="tel" placeholder="+241 ..." maxlength="20">
+
+    <div class="field-label">📖 Bio</div>
+    <input class="field-input" id="inputBio" type="text" placeholder="Quelques mots sur toi..." maxlength="80">
+
+    <div class="field-label">🌍 Ville</div>
+    <input class="field-input" id="inputCity" type="text" placeholder="Libreville, Port-Gentil..." maxlength="30">
+
+    <div class="anon-row" onclick="toggleAnon()">
+      <div>
+        <div class="title">🔒 Mode anonyme</div>
+        <div class="sub">Ton nom ne s'affiche pas aux autres</div>
+      </div>
+      <div class="toggle" id="toggleAnon"></div>
+    </div>
+
+    <div class="spacer"></div>
+    <button class="btn-gold" onclick="saveProfile()">💾 Enregistrer</button>
+
+    <div class="credit">
+      <div class="author">Conçu par Damien Starly Koumba</div>
+      PROTOTYPE NEYLA 241 🇬🇦
+    </div>
+  </div>
+
+  <!-- ============ INFO JEU ============ -->
+  <div class="screen" id="screenGameInfo">
+    <div class="app-header">
+      <button class="back-btn" onclick="goBack()">← Retour</button>
+      <div class="header-title" id="infoTitle">Jeu</div>
+      <div style="width:80px"></div>
+    </div>
+
+    <div class="card-display" style="min-height: 220px;">
+      <div class="card-type" style="background: rgba(251,191,36,0.2); color: #FBBF24;">BIENTÔT DISPONIBLE</div>
+      <div class="card-text" id="infoText" style="font-size: 17px;">
+        Ce jeu arrive très bientôt !
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+    <button class="btn-gold" onclick="goBack()">✅ Compris</button>
+
+    <div class="credit">
+      <div class="author">Conçu par Damien Starly Koumba</div>
+      PROTOTYPE NEYLA 241 🇬🇦
+    </div>
+  </div>
+
+  <!-- ============ ACTION OU VÉRITÉ — SETUP JOUEURS ============ -->
+  <div class="screen" id="screenAVSetup">
+    <div class="app-header">
+      <button class="back-btn" onclick="goBack()">← Retour</button>
+      <div class="header-title">Action ou Vérité</div>
+      <div class="flag sm"></div>
+    </div>
+
+    <div class="section-title">👥 Nombre de joueurs</div>
+    <div class="player-count-selector">
+      <button class="count-btn" onclick="changePlayerCount(-1)" id="btnMinus">−</button>
+      <div class="count-value" id="playerCountDisplay">3</div>
+      <button class="count-btn" onclick="changePlayerCount(1)" id="btnPlus">+</button>
+    </div>
+    <div class="count-label">De 2 à 15 joueurs</div>
+
+    <div class="section-title">📝 Noms des joueurs</div>
+    <div class="players-input-list" id="playersList"></div>
+
+    <div class="spacer"></div>
+    <button class="btn-primary" onclick="showCategoryScreen()">Suivant →</button>
+
+    <div class="credit">
+      <div class="author">Conçu par Damien Starly Koumba</div>
+      PROTOTYPE NEYLA 241 🇬🇦
+    </div>
+  </div>
+
+  <!-- ============ ACTION OU VÉRITÉ — CATÉGORIE ============ -->
+  <div class="screen" id="screenAVCategory">
+    <div class="app-header">
+      <button class="back-btn" onclick="goBack()">← Retour</button>
+      <div class="header-title">Catégorie</div>
+      <div class="flag sm"></div>
+    </div>
+
+    <div class="section-title">🎨 Choisis une catégorie</div>
+    <div class="category-grid">
+      <div class="category-card" data-cat="couple" onclick="selectCategory('couple', this)">
+        <span class="emoji">💕</span>
+        <div class="label">Couple</div>
+        <div class="sub">Amour & complicité</div>
+      </div>
+      <div class="category-card" data-cat="amis" onclick="selectCategory('amis', this)">
+        <span class="emoji">🤝</span>
+        <div class="label">Amis</div>
+        <div class="sub">Fun & délires</div>
+      </div>
+      <div class="category-card" data-cat="famille" onclick="selectCategory('famille', this)">
+        <span class="emoji">👨‍👩‍👧</span>
+        <div class="label">Famille</div>
+        <div class="sub">Tous ensemble</div>
+      </div>
+      <div class="category-card" data-cat="fun" onclick="selectCategory('fun', this)">
+        <span class="emoji">🔥</span>
+        <div class="label">Fun</div>
+        <div class="sub">Questions folles</div>
+      </div>
+    </div>
+
+    <div class="section-title">🎚️ Niveau</div>
+    <div class="level-row">
+      <div class="level-card" data-lvl="soft" onclick="selectLevel('soft', this)">
+        <span class="emoji">😊</span>
+        <div class="label">Soft</div>
+      </div>
+      <div class="level-card" data-lvl="moyen" onclick="selectLevel('moyen', this)">
+        <span class="emoji">😏</span>
+        <div class="label">Moyen</div>
+      </div>
+      <div class="level-card" data-lvl="hard" onclick="selectLevel('hard', this)">
+        <span class="emoji">🔥</span>
+        <div class="label">Hard</div>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+    <button class="btn-primary" onclick="startAVGame()">🎮 Commencer</button>
+
+    <div class="credit">
+      <div class="author">Conçu par Damien Starly Koumba</div>
+      PROTOTYPE NEYLA 241 🇬🇦
+    </div>
+  </div>
+
+  <!-- ============ ACTION OU VÉRITÉ — JEU ============ -->
+  <div class="screen" id="screenAVGame">
+    <div class="app-header">
+      <button class="back-btn" onclick="confirmQuit()">← Quitter</button>
+      <div class="header-title" id="avProgress">Tour 1</div>
+      <div class="flag sm"></div>
+    </div>
+
+    <div class="game-top">
+      <div class="player-badge active" id="currentPlayerBadge">
+        <div class="avatar" id="currentAvatar">A</div>
+        <div class="info">
+          <div class="label">C'est au tour de</div>
+          <div class="name" id="currentName">Joueur</div>
+        </div>
+      </div>
+      <div class="score-chip">
+        <div class="num" id="currentScore">0</div>
+        <div class="lbl">Points</div>
+      </div>
+    </div>
+
+    <div class="order-list" id="orderList"></div>
+
+    <!-- ÉTAPE 1 : Choix Action/Vérité -->
+    <div id="avStepChoice">
+      <div class="section-title" style="margin-top: 24px;">🎯 Choisis</div>
+      <div class="choice-grid">
+        <button class="choice-big action" onclick="chooseAction()">
+          <span class="emoji">💪</span>
+          <div class="label">ACTION</div>
+          <div class="sub">Relève le défi</div>
+        </button>
+        <button class="choice-big verite" onclick="chooseVerite()">
+          <span class="emoji">🗣️</span>
+          <div class="label">VÉRITÉ</div>
+          <div class="sub">Réponds honnêtement</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 2 : Carte affichée -->
+    <div id="avStepCard" style="display:none;">
+      <div class="card-display" id="avCard">
+        <div class="card-type" id="avCardType">ACTION</div>
+        <div class="card-text" id="avCardText">Défi...</div>
+      </div>
+      <div class="game-actions">
+        <button class="btn-secondary" onclick="skipTurn()">⏭️ Passer</button>
+        <button class="btn-gold" onclick="doneTurn()">✅ Fait !</button>
+      </div>
+    </div>
+
+    <div class="credit" style="margin-top: 30px;">
+      <div class="author">Conçu par Damien Starly Koumba</div>
+      PROTOTYPE NEYLA 241 🇬🇦
+    </div>
+  </div>
+
+  <!-- ============ ACTION OU VÉRITÉ — FIN ============ -->
+  <div class="screen" id="screenAVEnd">
+    <div class="app-header">
+      <button class="back-btn" onclick="goHome()">🏠 Menu</button>
+      <div class="header-title">Résultat</div>
+      <div class="flag sm"></div>
+    </div>
+
+    <div class="winner-card">
+      <span class="emoji">🏆</span>
+      <div class="name" id="winnerName">Joueur</div>
+      <div class="score" id="winnerScore">Score : 0</div>
+    </div>
+
+    <div class="section-title">📊 Scores finaux</div>
+    <div class="score-list" id="finalScores"></div>
+
+    <button class="btn-primary" onclick="restartAV()">🔁 Rejouer</button>
+    <button class="btn-secondary" onclick="goHome()">🏠 Retour au menu</button>
+
+    <div class="credit">
+      <div class="credit-flag-row">
+        <div class="flag xs"></div>
+        <div class="flag sm"></div>
+        <div class="flag xs"></div>
+      </div>
+      <div class="author">Conçu par Damien Starly Koumba</div>
+      PROTOTYPE NEYLA 241 🇬🇦
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   TOI & MOI — Prototype Neyla 241
+   Conçu par Damien Starly Koumba 🇬🇦
+   ========================================================= */
+
+/* ============ NAVIGATION ============ */
+const navStack = [];
+let currentScreen = 'screenHome';
+
+function showScreen(id, pushHistory = true) {
+  if (id === currentScreen) return;
+  const oldScreen = document.getElementById(currentScreen);
+  const newScreen = document.getElementById(id);
+  if (!newScreen) return;
+
+  if (oldScreen) {
+    oldScreen.classList.remove('active');
+    oldScreen.classList.add('exit');
+    setTimeout(() => oldScreen.classList.remove('exit'), 350);
+  }
+  newScreen.classList.add('active');
+  newScreen.scrollTop = 0;
+
+  if (pushHistory && id !== 'screenHome') {
+    navStack.push(currentScreen);
+  }
+  currentScreen = id;
+}
+
+function navigateTo(id) {
+  showScreen(id, true);
+}
+
+function goBack() {
+  if (navStack.length > 0) {
+    const prev = navStack.pop();
+    const old = document.getElementById(currentScreen);
+    const target = document.getElementById(prev);
+    if (old) { old.classList.remove('active'); old.classList.add('exit'); setTimeout(() => old.classList.remove('exit'), 350); }
+    if (target) { target.classList.add('active'); target.scrollTop = 0; }
+    currentScreen = prev;
+  } else {
+    goHome();
+  }
+}
+
+function goHome() {
+  navStack.length = 0;
+  const old = document.getElementById(currentScreen);
+  const home = document.getElementById('screenHome');
+  if (old && old !== home) { old.classList.remove('active'); }
+  if (home) { home.classList.add('active'); home.scrollTop = 0; }
+  currentScreen = 'screenHome';
+}
+
+/* ============ TOAST ============ */
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+/* ============ FONDS DÉFILANTS ============ */
+const BG_IMAGES = [
+  'https://loremflickr.com/800/1200/gabon,forest',
+  'https://loremflickr.com/800/1200/elephant,africa',
+  'https://loremflickr.com/800/1200/rainforest',
+  'https://loremflickr.com/800/1200/lion,safari',
+  'https://loremflickr.com/800/1200/flowers,tropical',
+  'https://loremflickr.com/800/1200/gorilla',
+  'https://loremflickr.com/800/1200/beach,ocean',
+  'https://loremflickr.com/800/1200/mountain,sunset'
+];
+let bgIndex = 0;
+let bgActive = 1;
+
+function cycleBackground() {
+  const next = bgActive === 1 ? 2 : 1;
+  const el = document.getElementById('bg' + next);
+  el.style.backgroundImage = 'url(' + BG_IMAGES[bgIndex % BG_IMAGES.length] + ')';
+  el.classList.add('active');
+  document.getElementById('bg' + bgActive).classList.remove('active');
+  bgActive = next;
+  bgIndex++;
+}
+
+/* ============ PROFIL ============ */
+let profile = { name: "", phone: "", bio: "", city: "", photo: "", anonymous: false };
+
+function loadProfile() {
+  try {
+    const raw = localStorage.getItem('tm_profile');
+    if (raw) profile = JSON.parse(raw);
+  } catch(e) {}
+  updateHomeProfile();
+}
+
+function updateHomeProfile() {
+  const avatar = document.getElementById('homeAvatar');
+  const nameEl = document.getElementById('homeName');
+  if (profile.photo) avatar.innerHTML = '<img src="' + profile.photo + '">';
+  else avatar.textContent = profile.name ? profile.name.charAt(0).toUpperCase() : '?';
+
+  if (profile.anonymous) nameEl.textContent = 'Anonyme';
+  else if (profile.name) nameEl.textContent = profile.name;
+  else nameEl.textContent = 'Profil';
+}
+
+function pickPhoto() { document.getElementById('photoInput').click(); }
+
+function handlePhoto(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    profile.photo = ev.target.result;
+    document.getElementById('avatarBig').innerHTML = '<img src="' + profile.photo + '">';
+  };
+  reader.readAsDataURL(f);
+}
+
+function toggleAnon() {
+  profile.anonymous = !profile.anonymous;
+  document.getElementById('toggleAnon').classList.toggle('on', profile.anonymous);
+}
+
+function saveProfile() {
+  profile.name = document.getElementById('inputName').value.trim();
+  profile.phone = document.getElementById('inputPhone').value.trim();
+  profile.bio = document.getElementById('inputBio').value.trim();
+  profile.city = document.getElementById('inputCity').value.trim();
+  localStorage.setItem('tm_profile', JSON.stringify(profile));
+  updateHomeProfile();
+  toast('✅ Profil enregistré');
+  setTimeout(goBack, 800);
+}
+
+function openProfileScreen() {
+  document.getElementById('inputName').value = profile.name || '';
+  document.getElementById('inputPhone').value = profile.phone || '';
+  document.getElementById('inputBio').value = profile.bio || '';
+  document.getElementById('inputCity').value = profile.city || '';
+  document.getElementById('toggleAnon').classList.toggle('on', profile.anonymous);
+  const ab = document.getElementById('avatarBig');
+  if (profile.photo) ab.innerHTML = '<img src="' + profile.photo + '">';
+  else ab.textContent = profile.name ? profile.name.charAt(0).toUpperCase() : '?';
+  navigateTo('screenProfile');
+}
+
+/* Override profile chip clicks */
+document.querySelectorAll('.profile-chip').forEach(el => {
+  el.onclick = openProfileScreen;
+});
+
+/* ============ INFO JEU ============ */
+function openGameInfo(name) {
+  document.getElementById('infoTitle').textContent = name;
+  document.getElementById('infoText').textContent = '🎮 ' + name + ' arrive bientôt dans une prochaine mise à jour !';
+  navigateTo('screenGameInfo');
+}
+
+/* =========================================================
+   ACTION OU VÉRITÉ
+   ========================================================= */
+
+/* ============ CONTENU DES CARTES ============ */
+const AV_CONTENT = {
+  couple: {
+    soft: {
+      actions: [
+        "Fais un compliment sincère à ton/ta partenaire.",
+        "Fais un câlin à ton/ta partenaire pendant 30 secondes.",
+        "Envoie un message d'amour à ton/ta partenaire.",
+        "Regarde ton/ta partenaire dans les yeux pendant 1 minute.",
+        "Chante une chanson d'amour à ton/ta partenaire.",
+        "Embrasse ton/ta partenaire sur le front.",
+        "Fais un massage des mains à ton/ta partenaire.",
+        "Dis 3 choses que tu aimes chez ton/ta partenaire."
+      ],
+      verites: [
+        "Quel est ton premier souvenir avec ton/ta partenaire ?",
+        "Qu'est-ce qui t'a attiré chez lui/elle ?",
+        "Quel est le plus beau compliment qu'on t'ait fait ?",
+        "Quelle est ta chanson préférée en couple ?",
+        "Quel est ton film romantique préféré ?",
+        "Quel est le plus beau voyage que tu voudrais faire avec lui/elle ?",
+        "Qu'est-ce que tu aimes le plus dans votre relation ?",
+        "Quelle est la chose la plus touchante qu'il/elle ait faite pour toi ?"
+      ]
+    },
+    moyen: {
+      actions: [
+        "Refais la première rencontre avec ton/ta partenaire.",
+        "Imite ton/ta partenaire pendant 1 minute.",
+        "Fais un strip-tease (soft) de 30 secondes.",
+        "Danse une chanson romantique avec ton/ta partenaire.",
+        "Écris un petit poème pour lui/elle en 2 minutes.",
+        "Montre une photo de ton/ta partenaire que tu préfères.",
+        "Fais un selfie romantique avec lui/elle.",
+        "Raconte votre rencontre à la façon d'une histoire."
+      ],
+      verites: [
+        "Quel est ton plus grand fantasme en couple ?",
+        "Quelle est la dernière fois où tu as menti à ton/ta partenaire ?",
+        "Qu'est-ce qui te dérange le plus chez lui/elle ?",
+        "Quel est ton endroit préféré pour un rendez-vous ?",
+        "As-tu déjà été jaloux/jalouse sans raison ?",
+        "Quelle est la chose la plus embarrassante qui vous soit arrivée ?",
+        "Combien de personnes as-tu aimées avant lui/elle ?",
+        "Quelle est ta plus grande peur dans votre relation ?"
+      ]
+    },
+    hard: {
+      actions: [
+        "Fais un vrai slow langoureux avec ton/ta partenaire.",
+        "Masse les pieds de ton/ta partenaire pendant 2 minutes.",
+        "Embrasse ton/ta partenaire pendant 30 secondes.",
+        "Raconte ton meilleur fantasme à voix haute.",
+        "Retire un vêtement de ton choix.",
+        "Fais 10 pompes en regardant ton/ta partenaire.",
+        "Danse de façon sensuelle devant lui/elle.",
+        "Prends une photo sexy et envoie-la-lui."
+      ],
+      verites: [
+        "Quel est ton endroit préféré sur son corps ?",
+        "Quelle est ta position préférée ?",
+        "Combien de fois par semaine penses-tu à lui/elle de façon intime ?",
+        "Quel est ton fantasme le plus secret ?",
+        "Qu'est-ce que tu aimerais essayer avec lui/elle ?",
+        "Quelle est ta plus grande insécurité en amour ?",
+        "As-tu déjà menti sur tes sentiments ?",
+        "Quel est ton plus beau souvenir intime ?"
+      ]
+    }
+  },
+  amis: {
+    soft: {
+      actions: [
+        "Imite un de tes amis présents pendant 30 secondes.",
+        "Fais un compliment sincère à la personne à ta droite.",
+        "Raconte ta blague préférée.",
+        "Danse pendant 30 secondes sans musique.",
+        "Fais un selfie ridicule et montre-le.",
+        "Chante le refrain de ta chanson préférée.",
+        "Fais une imitation de ton prof préféré.",
+        "Envoie un message drôle à ton dernier contact."
+      ],
+      verites: [
+        "Quel est ton plus grand rêve ?",
+        "Quelle est ta plus grande peur ?",
+        "Quel est ton pire souvenir d'école ?",
+        "Quelle est la dernière fois où tu as pleuré ?",
+        "Quel est ton plus gros défaut ?",
+        "Qui est ton meilleur ami ici ?",
+        "Quelle est la chose la plus folle que tu aies faite ?",
+        "Quel est ton péché mignon ?"
+      ]
+    },
+    moyen: {
+      actions: [
+        "Imite la personne à ta gauche pendant 1 minute.",
+        "Fais 20 pompes ou 30 squats.",
+        "Raconte une histoire embarrassante sur toi.",
+        "Laisse les autres écrire un statut sur ton téléphone.",
+        "Chante une chanson avec l'accent d'un pays.",
+        "Fais une déclaration d'amitié à quelqu'un ici.",
+        "Imite un animal pendant 30 secondes.",
+        "Refais une danse TikTok connue."
+      ],
+      verites: [
+        "Quel est ton plus gros mensonge ?",
+        "Qui ici ne mérite pas ta confiance ?",
+        "Quelle est la pire chose que tu aies faite ?",
+        "Combien de personnes as-tu déjà embrassées ?",
+        "Quelle est la chose que tu caches à tes parents ?",
+        "Quel est ton plus grand regret ?",
+        "Qui est ton ex le plus gênant ?",
+        "As-tu déjà trahi un ami ?"
+      ]
+    },
+    hard: {
+      actions: [
+        "Appelle ton ex et dis-lui bonjour.",
+        "Envoie un message d'amour à la 3e personne de tes contacts.",
+        "Fais 50 pompes.",
+        "Laisse quelqu'un prendre ton téléphone pendant 2 minutes.",
+        "Raconte ta pire honte en public.",
+        "Embrasse la personne à ta droite sur la joue.",
+        "Montre ta dernière conversation WhatsApp.",
+        "Fais un discours d'une minute sur toi."
+      ],
+      verites: [
+        "Quelle est la pire chose que tu aies pensée de quelqu'un ici ?",
+        "Quel est ton plus gros secret ?",
+        "As-tu déjà eu des sentiments pour un ami proche ?",
+        "Combien de fois as-tu menti aujourd'hui ?",
+        "Quelle est la chose la plus gênante sur ton téléphone ?",
+        "Qui ici te plaît le plus ?",
+        "Quel est ton plus grand échec amoureux ?",
+        "Si tu pouvais effacer une chose de ta vie, laquelle ?"
+      ]
+    }
+  },
+  famille: {
+    soft: {
+      actions: [
+        "Fais un compliment à chaque membre de la famille.",
+        "Raconte ton meilleur souvenir familial.",
+        "Fais un câlin à la personne à ta droite.",
+        "Chante une chanson que ta famille adore.",
+        "Imite un membre de ta famille.",
+        "Montre une photo de famille sur ton téléphone.",
+        "Dis 3 choses que tu aimes chez ta famille.",
+        "Fais un selfie avec tout le monde."
+      ],
+      verites: [
+        "Qui est ton modèle dans la famille ?",
+        "Quel est ton meilleur souvenir d'enfance ?",
+        "Quelle est ta tradition familiale préférée ?",
+        "Quel membre de la famille te fait le plus rire ?",
+        "Quel est ton plat préféré cuisiné à la maison ?",
+        "Qu'est-ce que tu admires chez tes parents ?",
+        "Quel est ton endroit préféré en famille ?",
+        "Quelle est la qualité que tu as héritée ?"
+      ]
+    },
+    moyen: {
+      actions: [
+        "Raconte une bêtise que tu as faite enfant.",
+        "Imite un membre de la famille pendant 1 minute.",
+        "Fais la vaisselle ce soir.",
+        "Prépare une surprise à quelqu'un ici.",
+        "Raconte une histoire embarrassante sur un membre.",
+        "Chante une chanson de mariage.",
+        "Fais le service pour tout le monde à table.",
+        "Explique un sujet comme si tu étais prof."
+      ],
+      verites: [
+        "Quel est ton plus gros secret de famille ?",
+        "Qui est ton préféré dans la famille ?",
+        "Quelle est la dernière fois où tu as menti à tes parents ?",
+        "Quel est ton plus grand regret familial ?",
+        "Quelle est la chose que tu voudrais changer dans la famille ?",
+        "Qui te stresse le plus ici ?",
+        "Quelle est la plus grosse dispute que tu aies eue ?",
+        "Quel secret de famille caches-tu ?"
+      ]
+    },
+    hard: {
+      actions: [
+        "Raconte la chose que tu regrettes le plus d'avoir dite à un membre.",
+        "Appelle un membre éloigné et dis-lui que tu l'aimes.",
+        "Fais un discours de 2 minutes sur la famille.",
+        "Embrasse chaque personne ici.",
+        "Fais une déclaration sincère à tes parents.",
+        "Raconte ta pire honte devant toute la famille.",
+        "Montre tes messages à quelqu'un ici.",
+        "Fais 30 pompes en annonçant tes excuses."
+      ],
+      verites: [
+        "Quelle est la vérité que tu n'as jamais dite à ta famille ?",
+        "Quel secret de famille caches-tu le plus ?",
+        "Qui t'a le plus blessé dans la famille ?",
+        "Quelle est ta plus grande peur concernant la famille ?",
+        "As-tu déjà voulu partir de la maison ?",
+        "Quel membre ne te mérite pas ?",
+        "Quelle est la pire chose qu'on t'ait dite ici ?",
+        "Quel est ton plus grand regret sur un proche ?"
+      ]
+    }
+  },
+  fun: {
+    soft: {
+      actions: [
+        "Fais la danse de la poule pendant 30 secondes.",
+        "Parle avec l'accent québécois pendant 1 minute.",
+        "Chante l'alphabet en chantant.",
+        "Fais une grimace et tiens-la 30 secondes.",
+        "Imite un présentateur télé.",
+        "Fais 10 sauts en étoile.",
+        "Raconte une histoire en 10 secondes.",
+        "Fais un beatbox."
+      ],
+      verites: [
+        "Quel est ton pire talent caché ?",
+        "Quelle est la chose la plus bizarre que tu aies mangée ?",
+        "Quel est ton pire souvenir de vacances ?",
+        "Quelle est ta plus grosse peur irrationnelle ?",
+        "Quel est ton pire défaut au réveil ?",
+        "Quelle est la chose la plus stupide que tu aies achetée ?",
+        "Quel est ton plaisir coupable ?",
+        "Quelle est la dernière fois où tu as ri tout seul ?"
+      ]
+    },
+    moyen: {
+      actions: [
+        "Fais 30 squats en chantant une chanson.",
+        "Raconte un rêve bizarre que tu as fait.",
+        "Imite ton prof/patron préféré.",
+        "Envoie un message bizarre à ton dernier contact.",
+        "Poste un selfie avec un filtre drôle.",
+        "Fais un discours de 1 minute sur les chaussettes.",
+        "Danse comme si personne ne regardait.",
+        "Imite une célébrité pendant 30 secondes."
+      ],
+      verites: [
+        "Quelle est la chose la plus embarrassante que tu aies faite en public ?",
+        "Quel est ton pire rendez-vous ?",
+        "Quelle est la pire chose que tu aies dite à quelqu'un ?",
+        "Combien de temps as-tu passé sur ton téléphone aujourd'hui ?",
+        "Quel est ton pire souvenir d'école ?",
+        "Quelle est ta pire habitude ?",
+        "Quel est ton plus grand échec ?",
+        "Quelle est la chose la plus bizarre sur ton téléphone ?"
+      ]
+    },
+    hard: {
+      actions: [
+        "Poste un statut embarrassant sur WhatsApp.",
+        "Appelle quelqu'un au hasard et chante.",
+        "Fais 100 sauts.",
+        "Imite une personne présente pendant 2 minutes.",
+        "Raconte ta pire honte en détail.",
+        "Laisse quelqu'un poster sur tes réseaux.",
+        "Fais un discours d'une minute sur pourquoi tu es bizarre.",
+        "Fais 20 pompes en chantant."
+      ],
+      verites: [
+        "Quelle est la chose la plus folle que tu aies faite sous l'effet de quelque chose ?",
+        "Quel est ton plus gros mensonge à tes parents ?",
+        "Quelle est la pire chose que tu aies pensée sur quelqu'un ici ?",
+        "Combien de personnes as-tu embrassées ?",
+        "Quel est ton plus grand secret honteux ?",
+        "Quelle est la chose la plus gênante dans ta chambre ?",
+        "Qui ici te dérange le plus ?",
+        "Quelle est la chose que tu n'as jamais avouée ?"
+      ]
+    }
+  }
+};
+
+/* ============ ÉTAT DU JEU ============ */
+let avPlayers = [];
+let avPlayerCount = 3;
+let avCategory = 'couple';
+let avLevel = 'soft';
+let avCurrentIndex = 0;
+let avState = 'choice'; // 'choice' ou 'card'
+let avUsedCards = { actions: [], verites: [] };
+
+/* ============ SETUP JOUEURS ============ */
+function startActionVerite() {
+  avPlayers = [];
+  avPlayerCount = 3;
+  avCategory = 'couple';
+  avLevel = 'soft';
+  avCurrentIndex = 0;
+  avUsedCards = { actions: [], verites: [] };
+  renderPlayerInputs();
+  navigateTo('screenAVSetup');
+}
+
+function changePlayerCount(delta) {
+  avPlayerCount += delta;
+  if (avPlayerCount < 2) avPlayerCount = 2;
+  if (avPlayerCount > 15) avPlayerCount = 15;
+  document.getElementById('playerCountDisplay').textContent = avPlayerCount;
+  document.getElementById('btnMinus').disabled = avPlayerCount <= 2;
+  document.getElementById('btnPlus').disabled = avPlayerCount >= 15;
+  renderPlayerInputs();
+}
+
+function renderPlayerInputs() {
+  const list = document.getElementById('playersList');
+  list.innerHTML = '';
+  for (let i = 0; i < avPlayerCount; i++) {
+    const existing = avPlayers[i] ? avPlayers[i].name : '';
+    const row = document.createElement('div');
+    row.className = 'player-input-row';
+    row.innerHTML = '<div class="player-num">' + (i + 1) + '</div>' +
+      '<input type="text" placeholder="Joueur ' + (i + 1) + '" value="' + existing + '" oninput="updatePlayerName(' + i + ', this.value)" maxlength="15">';
+    list.appendChild(row);
+  }
+}
+
+function updatePlayerName(i, val) {
+  if (!avPlayers[i]) avPlayers[i] = { name: '', score: 0, photo: '' };
+  avPlayers[i].name = val;
+}
+
+/* ============ CATÉGORIE ============ */
+function showCategoryScreen() {
+  // Construire la liste finale des joueurs
+  const finalPlayers = [];
+  for (let i = 0; i < avPlayerCount; i++) {
+    const p = avPlayers[i];
+    const name = (p && p.name && p.name.trim()) ? p.name.trim() : ('Joueur ' + (i + 1));
+    finalPlayers.push({ name: name, score: 0, photo: '' });
+  }
+  avPlayers = finalPlayers;
+  navigateTo('screenAVCategory');
+}
+
+function selectCategory(cat, el) {
+  avCategory = cat;
+  document.querySelectorAll('.category-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectLevel(lvl, el) {
+  avLevel = lvl;
+  document.querySelectorAll('.level-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+/* ============ LANCEMENT DU JEU ============ */
+function startAVGame() {
+  avCurrentIndex = 0;
+  avState = 'choice';
+  avUsedCards = { actions: [], verites: [] };
+  avPlayers.forEach(p => p.score = 0);
+  updateAVGameScreen();
+  navigateTo('screenAVGame');
+}
+
+function updateAVGameScreen() {
+  const current = avPlayers[avCurrentIndex];
+  document.getElementById('currentName').textContent = current.name;
+  document.getElementById('currentAvatar').textContent = current.name.charAt(0).toUpperCase();
+  document.getElementById('currentScore').textContent = current.score;
+  document.getElementById('avProgress').textContent = 'Tour ' + (avCurrentIndex + 1) + '/' + avPlayers.length;
+
+  // Ordre des joueurs
+  const orderEl = document.getElementById('orderList');
+  orderEl.innerHTML = '';
+  avPlayers.forEach((p, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'order-chip' + (i === avCurrentIndex ? ' current' : '');
+    chip.textContent = p.name + ' (' + p.score + ')';
+    orderEl.appendChild(chip);
+  });
+
+  // Réinitialiser les étapes
+  document.getElementById('avStepChoice').style.display = 'block';
+  document.getElementById('avStepCard').style.display = 'none';
+  avState = 'choice';
+}
+
+/* ============ CHOIX ============ */
+function chooseAction() {
+  avState = 'card';
+  showCard('action');
+}
+
+function chooseVerite() {
+  avState = 'card';
+  showCard('verite');
+}
+
+function showCard(type) {
+  const content = AV_CONTENT[avCategory][avLevel];
+  const pool = type === 'action' ? content.actions : content.verites;
+  const usedKey = type === 'action' ? 'actions' : 'verites';
+
+  // Si toutes les cartes sont utilisées, réinitialiser
+  if (avUsedCards[usedKey].length >= pool.length) {
+    avUsedCards[usedKey] = [];
+  }
+
+  // Trouver une carte non utilisée
+  let available = [];
+  for (let i = 0; i < pool.length; i++) {
+    if (!avUsedCards[usedKey].includes(i)) available.push(i);
+  }
+  const pick = available[Math.floor(Math.random() * available.length)];
+  avUsedCards[usedKey].push(pick);
+
+  const card = document.getElementById('avCard');
+  card.className = 'card-display ' + (type === 'action' ? 'action' : 'verite');
+  document.getElementById('avCardType').textContent = type === 'action' ? '💪 ACTION' : '🗣️ VÉRITÉ';
+  document.getElementById('avCardText').textContent = pool[pick];
+
+  document.getElementById('avStepChoice').style.display = 'none';
+  document.getElementById('avStepCard').style.display = 'block';
+}
+
+/* ============ ACTIONS DE TOUR ============ */
+function skipTurn() {
+  nextPlayer();
+}
+
+function doneTurn() {
+  avPlayers[avCurrentIndex].score++;
+  toast('+1 point pour ' + avPlayers[avCurrentIndex].name + ' !');
+  nextPlayer();
+}
+
+function nextPlayer() {
+  avCurrentIndex++;
+  if (avCurrentIndex >= avPlayers.length) {
+    showEndGame();
+  } else {
+    updateAVGameScreen();
+  }
+}
+
+function confirmQuit() {
+  if (confirm('Quitter la partie en cours ?')) goHome();
+}
+
+function restartAV() {
+  avCurrentIndex = 0;
+  avUsedCards = { actions: [], verites: [] };
+  avPlayers.forEach(p => p.score = 0);
+  updateAVGameScreen();
+  navigateTo('screenAVGame');
+}
+
+/* ============ FIN ============ */
+function showEndGame() {
+  // Trier les joueurs
+  const sorted = [...avPlayers].sort((a, b) => b.score - a.score);
+  const winner = sorted[0];
+
+  document.getElementById('winnerName').textContent = winner.name;
+  document.getElementById('winnerScore').textContent = winner.score + ' point' + (winner.score > 1 ? 's' : '');
+
+  const list = document.getElementById('finalScores');
+  list.innerHTML = '';
+  sorted.forEach((p, i) => {
+    const row = document.createElement('div');
+    row.className = 'score-row';
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1);
+    row.innerHTML = '<div class="rank">' + medal + '</div>' +
+      '<div class="name">' + p.name + '</div>' +
+      '<div class="pts">' + p.score + ' pt' + (p.score > 1 ? 's' : '') + '</div>';
+    list.appendChild(row);
+  });
+
+  navigateTo('screenAVEnd');
+}
+
+/* ============ INITIALISATION ============ */
+document.addEventListener('DOMContentLoaded', () => {
+  loadProfile();
+  document.getElementById('btnMinus').disabled = false;
+  document.getElementById('btnPlus').disabled = false;
+
+  // Premier fond
+  document.getElementById('bg1').style.backgroundImage = 'url(' + BG_IMAGES[0] + ')';
+  document.getElementById('bg1').classList.add('active');
+  bgIndex = 1;
+
+  // Faire défiler toutes les 6 secondes
+  setInterval(cycleBackground, 6000);
+
+  // Bouton retour Android
+  window.addEventListener('popstate', goBack);
+});
+
+// Gestion du bouton retour physique Android
+window.addEventListener('load', () => {
+  history.pushState({ screen: 'home' }, '');
+});
+window.addEventListener('popstate', () => {
+  history.pushState({ screen: currentScreen }, '');
+  goBack();
+});
+</script>
+
+</body>
+</html>
