@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0B0F1A">
-<title>Toi & Moi 🇬🇦 — Prototype Neyla 241</title>
+<title>Chuchote 🇬🇦</title>
 
 <!-- 🔧 Console de débogage mobile (retire ces 2 lignes en production) -->
 <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
@@ -610,9 +610,9 @@ html, body {
       </div>
     </div>
 
-    <div class="home-logo"><div class="logo-tv"><div class="logo-tv-inner">D</div></div></div>
-    <div class="home-title">Toi & Moi</div>
-    <div class="home-sub">Prototype Neyla 241</div>
+    <div class="home-logo"><div class="logo-tv"><div class="logo-tv-inner">🤫</div></div></div>
+    <div class="home-title">Chuchote</div>
+    <div class="home-sub">Messages anonymes entre amis</div>
     <div class="flag-row">
       <div class="flag"></div>
       <div class="flag lg"></div>
@@ -626,7 +626,7 @@ html, body {
 
     <div class="marquee-banner">
       <span class="flag sm"></span>
-      <div class="marquee"><span>🇬🇦 Cette application est construite 100% gabonaise  •  Conçu par Damien Starly Koumba  •  Prototype Neyla 241  •  </span></div>
+      <div class="marquee"><span>🇬🇦 Cette application est construite 100% gabonaise  •  Conçu par Damien Starly Koumba  •  </span></div>
       <span class="flag sm"></span>
     </div>
 
@@ -1283,7 +1283,7 @@ html, body {
 
 <script type="module">
 /* =========================================================
-   TOI & MOI — Prototype Neyla 241
+   CHUCHOTE
    Conçu par Damien Starly Koumba 🇬🇦
    ========================================================= */
 
@@ -1947,7 +1947,7 @@ async function leaveRoom() {
 }
 
 function shareRoom() {
-  const msg = "🎮 Rejoins ma partie Toi & Moi !\n\nCode : " + currentRoomId +
+  const msg = "🎮 Rejoins ma partie Chuchote !\n\nCode : " + currentRoomId +
               "\n\n👉 " + window.location.origin + window.location.pathname;
   window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
 }
@@ -2118,7 +2118,8 @@ function openMessagerie() {
 function checkMsgUrl() {
   const params = new URLSearchParams(window.location.search);
   const toUser = params.get('to');
-  if (toUser && currentScreen === 'screenMessagerie') {
+  if (toUser) {
+    navigateTo('screenMessagerie');
     document.getElementById('msgStep1').classList.add('hidden');
     document.getElementById('msgStep2').classList.add('hidden');
     document.getElementById('msgStep3').classList.remove('hidden');
@@ -2145,7 +2146,7 @@ async function createMyLink() {
 
 function shareMyLink() {
   const link = document.getElementById('myLink').value;
-  const msg = "🕵️ Envoie-moi un message anonyme !\n\n" + link;
+  const msg = "🕵️ Envoie-moi un message anonyme, je ne verrai rien, défoule-toi 🤫\n\n" + link;
   window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
 }
 
