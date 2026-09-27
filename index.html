@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0B0F1A">
 <title>Toi & Moi 🇬🇦 — Prototype Neyla 241</title>
+
+<!-- 🔧 Console de débogage mobile (retire ces 2 lignes en production) -->
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
+
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 :root {
@@ -805,250 +810,252 @@ html, body {
       PROTOTYPE NEYLA 241 🇬🇦
     </div>
   </div>
+
   <!-- ============ QUI DE NOUS DEUX ============ -->
-<div class="screen" id="screenQNDD">
-  <div class="app-header">
-    <button class="back-btn" onclick="goBack()">← Retour</button>
-    <div class="header-title">Qui de nous deux ?</div>
-    <span class="flag sm"></span>
+  <div class="screen" id="screenQNDD">
+    <div class="app-header">
+      <button class="back-btn" onclick="goBack()">← Retour</button>
+      <div class="header-title">Qui de nous deux ?</div>
+      <span class="flag sm"></span>
+    </div>
+
+    <div id="qnddSetup">
+      <div class="section-title">👥 Joueurs</div>
+      <input class="field-input" id="qnddP1" type="text" placeholder="Joueur 1" maxlength="15">
+      <input class="field-input" id="qnddP2" type="text" placeholder="Joueur 2" maxlength="15">
+      <div class="section-title">🎨 Catégorie</div>
+      <div class="category-grid">
+        <div class="category-card" data-qcat="couple" onclick="qnddCat('couple', this)">
+          <span class="emoji">💕</span>
+          <div class="label">Couple</div>
+        </div>
+        <div class="category-card" data-qcat="amis" onclick="qnddCat('amis', this)">
+          <span class="emoji">🤝</span>
+          <div class="label">Amis</div>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn-primary" onclick="startQNDD()">🎮 Commencer</button>
+    </div>
+
+    <div id="qnddGame" class="hidden">
+      <div class="game-top">
+        <div class="player-badge active" id="qnddBadge">
+          <div class="avatar" id="qnddAvatar">J</div>
+          <div class="info">
+            <div class="label">C'est au tour de</div>
+            <div class="name" id="qnddName">Joueur</div>
+          </div>
+        </div>
+        <div class="score-chip">
+          <div class="num" id="qnddProgress">1/10</div>
+          <div class="lbl">Question</div>
+        </div>
+      </div>
+      <div class="card-display" id="qnddCard">
+        <div class="card-type">QUESTION</div>
+        <div class="card-text" id="qnddQuestion">Question...</div>
+      </div>
+      <div class="choice-grid">
+        <button class="choice-big action" onclick="qnddAnswer('toi')">
+          <span class="emoji">👤</span>
+          <div class="label">MOI</div>
+        </button>
+        <button class="choice-big verite" onclick="qnddAnswer('lui')">
+          <span class="emoji">👥</span>
+          <div class="label">L'AUTRE</div>
+        </button>
+      </div>
+    </div>
+
+    <div id="qnddReveal" class="hidden">
+      <div class="card-display">
+        <div class="card-type">RÉSULTAT</div>
+        <div class="card-text" id="qnddResult" style="font-size:28px;">—</div>
+      </div>
+      <div class="reveal-box p1" style="margin-top:16px;">
+        <div class="reveal-name" id="qnddName1">JOUEUR 1</div>
+        <div class="reveal-answer" id="qnddAns1">—</div>
+      </div>
+      <div class="reveal-box p2">
+        <div class="reveal-name" id="qnddName2">JOUEUR 2</div>
+        <div class="reveal-answer" id="qnddAns2">—</div>
+      </div>
+      <button class="btn-primary" onclick="qnddNext()" style="margin-top:16px;">Question suivante →</button>
+    </div>
+
+    <div id="qnddEnd" class="hidden">
+      <div class="final-title">🏆 Résultat final</div>
+      <div class="winner-card">
+        <span class="emoji">🎉</span>
+        <div class="name" id="qnddWinner">—</div>
+        <div class="score" id="qnddScore">0 - 0</div>
+      </div>
+      <button class="btn-primary" onclick="startQNDD()">🔁 Rejouer</button>
+      <button class="btn-gray" onclick="goHome()">🏠 Menu</button>
+    </div>
+
+    <div class="credit">
+      <div class="author">Conçu par Damien Starly Koumba</div>
+      PROTOTYPE NEYLA 241 🇬🇦
+    </div>
   </div>
 
-  <div id="qnddSetup">
-    <div class="section-title">👥 Joueurs</div>
-    <input class="field-input" id="qnddP1" type="text" placeholder="Joueur 1" maxlength="15">
-    <input class="field-input" id="qnddP2" type="text" placeholder="Joueur 2" maxlength="15">
-    <div class="section-title">🎨 Catégorie</div>
+  <!-- ============ ACTION OU VÉRITÉ — SETUP ============ -->
+  <div class="screen" id="screenAVSetup">
+    <div class="app-header">
+      <button class="back-btn" onclick="goBack()">← Retour</button>
+      <div class="header-title">Action ou Vérité</div>
+      <span class="flag sm"></span>
+    </div>
+    <div class="section-title">👥 Nombre de joueurs</div>
+    <div class="player-count-selector">
+      <button class="count-btn" onclick="changePlayerCount(-1)" id="btnMinus">−</button>
+      <div class="count-value" id="playerCountDisplay">3</div>
+      <button class="count-btn" onclick="changePlayerCount(1)" id="btnPlus">+</button>
+    </div>
+    <div class="count-label">De 2 à 15 joueurs</div>
+    <div class="section-title">📝 Noms des joueurs</div>
+    <div class="players-input-list" id="playersList"></div>
+    <div class="spacer"></div>
+    <button class="btn-primary" onclick="showCategoryScreen()">Suivant →</button>
+    <div class="credit">
+      <div class="author">Conçu par Damien Starly Koumba</div>
+      PROTOTYPE NEYLA 241 🇬🇦
+    </div>
+  </div>
+
+  <!-- ============ ACTION OU VÉRITÉ — CATÉGORIE ============ -->
+  <div class="screen" id="screenAVCategory">
+    <div class="app-header">
+      <button class="back-btn" onclick="goBack()">← Retour</button>
+      <div class="header-title">Catégorie</div>
+      <span class="flag sm"></span>
+    </div>
+    <div class="section-title">🎨 Choisis une catégorie</div>
     <div class="category-grid">
-      <div class="category-card" data-qcat="couple" onclick="qnddCat('couple', this)">
+      <div class="category-card" data-cat="couple" onclick="selectCategory('couple', this)">
         <span class="emoji">💕</span>
         <div class="label">Couple</div>
+        <div class="sub">Amour & complicité</div>
       </div>
-      <div class="category-card" data-qcat="amis" onclick="qnddCat('amis', this)">
+      <div class="category-card" data-cat="amis" onclick="selectCategory('amis', this)">
         <span class="emoji">🤝</span>
         <div class="label">Amis</div>
+        <div class="sub">Fun & délires</div>
+      </div>
+      <div class="category-card" data-cat="famille" onclick="selectCategory('famille', this)">
+        <span class="emoji">👨‍👩‍👧</span>
+        <div class="label">Famille</div>
+        <div class="sub">Tous ensemble</div>
+      </div>
+      <div class="category-card" data-cat="fun" onclick="selectCategory('fun', this)">
+        <span class="emoji">🔥</span>
+        <div class="label">Fun</div>
+        <div class="sub">Questions folles</div>
+      </div>
+    </div>
+    <div class="section-title">🎚️ Niveau</div>
+    <div class="level-row">
+      <div class="level-card" data-lvl="soft" onclick="selectLevel('soft', this)">
+        <span class="emoji">😊</span>
+        <div class="label">Soft</div>
+      </div>
+      <div class="level-card" data-lvl="moyen" onclick="selectLevel('moyen', this)">
+        <span class="emoji">😏</span>
+        <div class="label">Moyen</div>
+      </div>
+      <div class="level-card" data-lvl="hard" onclick="selectLevel('hard', this)">
+        <span class="emoji">🔥</span>
+        <div class="label">Hard</div>
       </div>
     </div>
     <div class="spacer"></div>
-    <button class="btn-primary" onclick="startQNDD()">🎮 Commencer</button>
+    <button class="btn-primary" onclick="startAVGame()">🎮 Commencer</button>
+    <div class="credit">
+      <div class="author">Conçu par Damien Starly Koumba</div>
+      PROTOTYPE NEYLA 241 🇬🇦
+    </div>
   </div>
 
-  <div id="qnddGame" class="hidden">
+  <!-- ============ ACTION OU VÉRITÉ — JEU ============ -->
+  <div class="screen" id="screenAVGame">
+    <div class="app-header">
+      <button class="back-btn" onclick="confirmQuit()">← Quitter</button>
+      <div class="header-title" id="avProgress">Tour 1</div>
+      <span class="flag sm"></span>
+    </div>
     <div class="game-top">
-      <div class="player-badge active" id="qnddBadge">
-        <div class="avatar" id="qnddAvatar">J</div>
+      <div class="player-badge active" id="currentPlayerBadge">
+        <div class="avatar" id="currentAvatar">A</div>
         <div class="info">
           <div class="label">C'est au tour de</div>
-          <div class="name" id="qnddName">Joueur</div>
+          <div class="name" id="currentName">Joueur</div>
         </div>
       </div>
       <div class="score-chip">
-        <div class="num" id="qnddProgress">1/10</div>
-        <div class="lbl">Question</div>
+        <div class="num" id="currentScore">0</div>
+        <div class="lbl">Points</div>
       </div>
     </div>
-    <div class="card-display" id="qnddCard">
-      <div class="card-type">QUESTION</div>
-      <div class="card-text" id="qnddQuestion">Question...</div>
+    <div class="players-lobby">
+      <div class="title">👥 Ordre des joueurs</div>
+      <div id="orderList"></div>
     </div>
-    <div class="choice-grid">
-      <button class="choice-big action" onclick="qnddAnswer('toi')">
-        <span class="emoji">👤</span>
-        <div class="label">MOI</div>
-      </button>
-      <button class="choice-big verite" onclick="qnddAnswer('lui')">
-        <span class="emoji">👥</span>
-        <div class="label">L'AUTRE</div>
-      </button>
+    <div id="avStepChoice">
+      <div class="section-title">🎯 Choisis</div>
+      <div class="choice-grid">
+        <button class="choice-big action" onclick="chooseAction()">
+          <span class="emoji">💪</span>
+          <div class="label">ACTION</div>
+          <div class="sub">Relève le défi</div>
+        </button>
+        <button class="choice-big verite" onclick="chooseVerite()">
+          <span class="emoji">🗣️</span>
+          <div class="label">VÉRITÉ</div>
+          <div class="sub">Réponds honnêtement</div>
+        </button>
+      </div>
+    </div>
+    <div id="avStepCard" class="hidden">
+      <div class="card-display" id="avCard">
+        <div class="card-type" id="avCardType">ACTION</div>
+        <div class="card-text" id="avCardText">Défi...</div>
+      </div>
+      <div class="game-actions">
+        <button class="btn-gray" onclick="skipTurn()">⏭️ Passer</button>
+        <button class="btn-gold" onclick="doneTurn()">✅ Fait !</button>
+      </div>
+    </div>
+    <div class="credit">
+      <div class="author">Conçu par Damien Starly Koumba</div>
+      PROTOTYPE NEYLA 241 🇬🇦
     </div>
   </div>
 
-  <div id="qnddReveal" class="hidden">
-    <div class="card-display">
-      <div class="card-type">RÉSULTAT</div>
-      <div class="card-text" id="qnddResult" style="font-size:28px;">—</div>
+  <!-- ============ ACTION OU VÉRITÉ — FIN ============ -->
+  <div class="screen" id="screenAVEnd">
+    <div class="app-header">
+      <button class="back-btn" onclick="goHome()">🏠 Menu</button>
+      <div class="header-title">Résultat</div>
+      <span class="flag sm"></span>
     </div>
-    <div class="reveal-box p1" style="margin-top:16px;">
-      <div class="reveal-name" id="qnddName1">JOUEUR 1</div>
-      <div class="reveal-answer" id="qnddAns1">—</div>
-    </div>
-    <div class="reveal-box p2">
-      <div class="reveal-name" id="qnddName2">JOUEUR 2</div>
-      <div class="reveal-answer" id="qnddAns2">—</div>
-    </div>
-    <button class="btn-primary" onclick="qnddNext()" style="margin-top:16px;">Question suivante →</button>
-  </div>
-
-  <div id="qnddEnd" class="hidden">
-    <div class="final-title">🏆 Résultat final</div>
     <div class="winner-card">
-      <span class="emoji">🎉</span>
-      <div class="name" id="qnddWinner">—</div>
-      <div class="score" id="qnddScore">0 - 0</div>
+      <span class="emoji">🏆</span>
+      <div class="name" id="winnerName">Joueur</div>
+      <div class="score" id="winnerScore">Score : 0</div>
     </div>
-    <button class="btn-primary" onclick="startQNDD()">🔁 Rejouer</button>
-    <button class="btn-gray" onclick="goHome()">🏠 Menu</button>
+    <div class="section-title">📊 Scores finaux</div>
+    <div class="score-list" id="finalScores"></div>
+    <button class="btn-primary" onclick="restartAV()">🔁 Rejouer</button>
+    <button class="btn-gray" onclick="goHome()">🏠 Retour au menu</button>
+    <div class="credit">
+      <div class="flag xs" style="margin:0 auto 8px;"></div>
+      <div class="author">Conçu par Damien Starly Koumba</div>
+      PROTOTYPE NEYLA 241 🇬🇦
+    </div>
   </div>
 
-  <div class="credit">
-    <div class="author">Conçu par Damien Starly Koumba</div>
-    PROTOTYPE NEYLA 241 🇬🇦
-  </div>
-</div>
-
-<!-- ============ ACTION OU VÉRITÉ — SETUP ============ -->
-<div class="screen" id="screenAVSetup">
-  <div class="app-header">
-    <button class="back-btn" onclick="goBack()">← Retour</button>
-    <div class="header-title">Action ou Vérité</div>
-    <span class="flag sm"></span>
-  </div>
-  <div class="section-title">👥 Nombre de joueurs</div>
-  <div class="player-count-selector">
-    <button class="count-btn" onclick="changePlayerCount(-1)" id="btnMinus">−</button>
-    <div class="count-value" id="playerCountDisplay">3</div>
-    <button class="count-btn" onclick="changePlayerCount(1)" id="btnPlus">+</button>
-  </div>
-  <div class="count-label">De 2 à 15 joueurs</div>
-  <div class="section-title">📝 Noms des joueurs</div>
-  <div class="players-input-list" id="playersList"></div>
-  <div class="spacer"></div>
-  <button class="btn-primary" onclick="showCategoryScreen()">Suivant →</button>
-  <div class="credit">
-    <div class="author">Conçu par Damien Starly Koumba</div>
-    PROTOTYPE NEYLA 241 🇬🇦
-  </div>
-</div>
-
-<!-- ============ ACTION OU VÉRITÉ — CATÉGORIE ============ -->
-<div class="screen" id="screenAVCategory">
-  <div class="app-header">
-    <button class="back-btn" onclick="goBack()">← Retour</button>
-    <div class="header-title">Catégorie</div>
-    <span class="flag sm"></span>
-  </div>
-  <div class="section-title">🎨 Choisis une catégorie</div>
-  <div class="category-grid">
-    <div class="category-card" data-cat="couple" onclick="selectCategory('couple', this)">
-      <span class="emoji">💕</span>
-      <div class="label">Couple</div>
-      <div class="sub">Amour & complicité</div>
-    </div>
-    <div class="category-card" data-cat="amis" onclick="selectCategory('amis', this)">
-      <span class="emoji">🤝</span>
-      <div class="label">Amis</div>
-      <div class="sub">Fun & délires</div>
-    </div>
-    <div class="category-card" data-cat="famille" onclick="selectCategory('famille', this)">
-      <span class="emoji">👨‍👩‍👧</span>
-      <div class="label">Famille</div>
-      <div class="sub">Tous ensemble</div>
-    </div>
-    <div class="category-card" data-cat="fun" onclick="selectCategory('fun', this)">
-      <span class="emoji">🔥</span>
-      <div class="label">Fun</div>
-      <div class="sub">Questions folles</div>
-    </div>
-  </div>
-  <div class="section-title">🎚️ Niveau</div>
-  <div class="level-row">
-    <div class="level-card" data-lvl="soft" onclick="selectLevel('soft', this)">
-      <span class="emoji">😊</span>
-      <div class="label">Soft</div>
-    </div>
-    <div class="level-card" data-lvl="moyen" onclick="selectLevel('moyen', this)">
-      <span class="emoji">😏</span>
-      <div class="label">Moyen</div>
-    </div>
-    <div class="level-card" data-lvl="hard" onclick="selectLevel('hard', this)">
-      <span class="emoji">🔥</span>
-      <div class="label">Hard</div>
-    </div>
-  </div>
-  <div class="spacer"></div>
-  <button class="btn-primary" onclick="startAVGame()">🎮 Commencer</button>
-  <div class="credit">
-    <div class="author">Conçu par Damien Starly Koumba</div>
-    PROTOTYPE NEYLA 241 🇬🇦
-  </div>
-</div>
-
-<!-- ============ ACTION OU VÉRITÉ — JEU ============ -->
-<div class="screen" id="screenAVGame">
-  <div class="app-header">
-    <button class="back-btn" onclick="confirmQuit()">← Quitter</button>
-    <div class="header-title" id="avProgress">Tour 1</div>
-    <span class="flag sm"></span>
-  </div>
-  <div class="game-top">
-    <div class="player-badge active" id="currentPlayerBadge">
-      <div class="avatar" id="currentAvatar">A</div>
-      <div class="info">
-        <div class="label">C'est au tour de</div>
-        <div class="name" id="currentName">Joueur</div>
-      </div>
-    </div>
-    <div class="score-chip">
-      <div class="num" id="currentScore">0</div>
-      <div class="lbl">Points</div>
-    </div>
-  </div>
-  <div class="players-lobby">
-    <div class="title">👥 Ordre des joueurs</div>
-    <div id="orderList"></div>
-  </div>
-  <div id="avStepChoice">
-    <div class="section-title">🎯 Choisis</div>
-    <div class="choice-grid">
-      <button class="choice-big action" onclick="chooseAction()">
-        <span class="emoji">💪</span>
-        <div class="label">ACTION</div>
-        <div class="sub">Relève le défi</div>
-      </button>
-      <button class="choice-big verite" onclick="chooseVerite()">
-        <span class="emoji">🗣️</span>
-        <div class="label">VÉRITÉ</div>
-        <div class="sub">Réponds honnêtement</div>
-      </button>
-    </div>
-  </div>
-  <div id="avStepCard" class="hidden">
-    <div class="card-display" id="avCard">
-      <div class="card-type" id="avCardType">ACTION</div>
-      <div class="card-text" id="avCardText">Défi...</div>
-    </div>
-    <div class="game-actions">
-      <button class="btn-gray" onclick="skipTurn()">⏭️ Passer</button>
-      <button class="btn-gold" onclick="doneTurn()">✅ Fait !</button>
-    </div>
-  </div>
-  <div class="credit">
-    <div class="author">Conçu par Damien Starly Koumba</div>
-    PROTOTYPE NEYLA 241 🇬🇦
-  </div>
-</div>
-
-<!-- ============ ACTION OU VÉRITÉ — FIN ============ -->
-<div class="screen" id="screenAVEnd">
-  <div class="app-header">
-    <button class="back-btn" onclick="goHome()">🏠 Menu</button>
-    <div class="header-title">Résultat</div>
-    <span class="flag sm"></span>
-  </div>
-  <div class="winner-card">
-    <span class="emoji">🏆</span>
-    <div class="name" id="winnerName">Joueur</div>
-    <div class="score" id="winnerScore">Score : 0</div>
-  </div>
-  <div class="section-title">📊 Scores finaux</div>
-  <div class="score-list" id="finalScores"></div>
-  <button class="btn-primary" onclick="restartAV()">🔁 Rejouer</button>
-  <button class="btn-gray" onclick="goHome()">🏠 Retour au menu</button>
-  <div class="credit">
-    <div class="flag xs" style="margin:0 auto 8px;"></div>
-    <div class="author">Conçu par Damien Starly Koumba</div>
-    PROTOTYPE NEYLA 241 🇬🇦
-  </div>
-</div>
   <!-- ============ MULTIJOUEUR — ACCUEIL ============ -->
   <div class="screen" id="screenMultiHome">
     <div class="app-header">
@@ -1273,6 +1280,7 @@ html, body {
 </div>
 
 <div class="toast" id="toast"></div>
+
 <script type="module">
 /* =========================================================
    TOI & MOI — Prototype Neyla 241
@@ -2010,15 +2018,17 @@ function renderMultiGame(data) {
   document.getElementById('multiGameWait').classList.add('hidden');
   document.getElementById('multiQuestionText').textContent = data.currentQuestion;
   const answerCount = Object.keys(answers).length;
+  // ✅ Sélecteur scopé au bloc multijoueur uniquement
+  const btns = document.querySelectorAll('#multiGameQuestion .choice-big');
   if (myAnswer && answerCount >= players.length) showMultiResult(data);
   else if (myAnswer) {
     document.getElementById('multiGameQuestion').classList.remove('hidden');
     document.getElementById('multiGameResult').classList.add('hidden');
-    document.querySelectorAll('.choice-big').forEach(b => b.disabled = true);
+    btns.forEach(b => b.disabled = true);
   } else {
     document.getElementById('multiGameQuestion').classList.remove('hidden');
     document.getElementById('multiGameResult').classList.add('hidden');
-    document.querySelectorAll('.choice-big').forEach(b => b.disabled = false);
+    btns.forEach(b => b.disabled = false);
   }
 }
 
@@ -2211,6 +2221,31 @@ document.addEventListener('DOMContentLoaded', () => {
 window.addEventListener('popstate', () => {
   history.pushState({ screen: currentScreen }, '');
   goBack();
+});
+
+/* =========================================================
+   ✅ EXPOSITION GLOBALE POUR LES onclick="..."
+   (indispensable car le script est en type="module")
+   ========================================================= */
+Object.assign(window, {
+  // Navigation
+  showScreen, goBack, goHome, openProfileScreen, openGameInfo,
+  // Profil
+  pickPhoto, handlePhoto, toggleAnon, saveProfile,
+  // Menu principal
+  startActionVerite, startQNDDSetup, openMultiplayer, openMessagerie,
+  // Qui de nous deux
+  qnddCat, startQNDD, qnddAnswer, qnddNext,
+  // Action ou Vérité
+  changePlayerCount, updatePlayerName, showCategoryScreen,
+  selectCategory, selectLevel, startAVGame,
+  confirmQuit, chooseAction, chooseVerite, skipTurn, doneTurn, restartAV,
+  // Multijoueur
+  createRoom, joinRoom, leaveRoom, shareRoom,
+  startMultiGame, submitAnswer, nextQuestion,
+  // Messagerie anonyme
+  createMyLink, shareMyLink, copyMyLink,
+  showMyMessages, backToMsgMenu, sendAnonMsg
 });
 </script>
 </body>
